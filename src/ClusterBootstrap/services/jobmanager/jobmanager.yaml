@@ -1,0 +1,75 @@
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: jobmanager
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      jobmanager-node: pod
+  template:
+    metadata:
+      name: jobmanager
+      labels:
+        jobmanager-node: pod
+    spec:
+      {% if cnf["dnsPolicy"] %}    
+      dnsPolicy: {{cnf["dnsPolicy"]}}
+      {% endif %}
+      hostNetwork: true    
+      nodeSelector:
+        jobmanager: active
+      containers:
+      - name: jobmanager
+        image: {{cnf["worker-dockerregistry"]}}{{cnf["dockerprefix"]}}{{cnf["restfulapi"]}}:{{cnf["dockertag"]}}
+        command: ["/runScheduler.sh"]
+        imagePullPolicy: Always
+        volumeMounts:
+        - mountPath: /etc/kubernetes/ssl
+          name: certs
+        - mountPath: /root/.kube/config 
+          name: kubeconfig
+        - mountPath: /RestfulAPI 
+          name: restfulapiconfig
+        - mountPath: {{cnf["storage-mount-path"]}}/work
+          name: dlwsdatawork
+        - mountPath: {{cnf["storage-mount-path"]}}/storage
+          name: dlwsdatadata 
+        - mountPath: {{cnf["storage-mount-path"]}}/jobfiles
+          name: dlwsdatajobfiles
+        - mountPath: /var/log/dlworkspace
+          name: log
+        - mountPath: /etc/resolv.conf
+          name: resolv                                                    
+      volumes:
+      - name: certs
+        hostPath:
+          path: /etc/kubernetes/ssl
+      - name: kubeconfig
+        hostPath:
+          path: /etc/kubernetes/restapi-kubeconfig.yaml
+      - name: restfulapiconfig
+        hostPath:
+          path: /etc/RestfulAPI
+      - name: dlwsdatawork
+        hostPath:
+          path: {{cnf["storage-mount-path"]}}/work 
+      - name: dlwsdatadata
+        hostPath:
+          path: {{cnf["storage-mount-path"]}}/storage
+      - name: dlwsdatajobfiles
+        hostPath:
+          path: {{cnf["storage-mount-path"]}}/jobfiles           
+      - name: log
+        hostPath:
+          path: /var/log/clustermanager
+      - name: resolv
+        hostPath:
+          path: /etc/resolv.conf        
+   
+      tolerations:
+      - key: CriticalAddonsOnly
+        operator: Exists
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule   
+        

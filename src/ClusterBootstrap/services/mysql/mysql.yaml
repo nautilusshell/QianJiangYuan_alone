@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: kube-system
+spec:
+  ports:
+  - port: {{cnf["mysql_port"]}}
+  selector:
+    app: mysql
+---
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: mysql
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      nodeSelector:
+        mysql: active
+      hostNetwork: true    
+      containers:
+      - image: {{cnf["dockers"]["container"]["mysql"]["fullname"]}}
+        name: mysql
+        env:
+          # Use secret in real usage
+        - name: MYSQL_ROOT_PASSWORD
+          value: {{cnf["mysql_password"]}}
+        ports:
+        - containerPort: {{cnf["mysql_port"]}}
+          name: mysql
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: /var/lib/mysql
+        - name: mysql-log
+          mountPath: /var/log/mysql          
+      volumes:
+      - name: mysql-storage
+        hostPath:
+          path: {{cnf["mysql_data_path"]}}
+      - name: mysql-log
+        hostPath:
+          path: /var/log/mysql
+          
+      tolerations:
+      - key: CriticalAddonsOnly
+        operator: Exists
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule            

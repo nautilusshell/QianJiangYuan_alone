@@ -1,0 +1,32 @@
+database :
+  hostname : {{cnf["sqlserver-hostname"]}}
+  username : {{cnf["sqlserver-username"]}}
+  password : {{cnf["sqlserver-password"]}}
+  database : {{cnf["sqlserver-database"]}}
+mysql :
+  hostname : {{cnf["mysql_node"]}}
+  port : {{cnf["mysql_port"]}}
+  username : {{cnf["mysql_username"]}}
+  password : {{cnf["mysql_password"]}}
+kubelet-path : /usr/local/bin/kubectl
+storage-mount-path : {{cnf["storage-mount-path"]}}
+root-path : /DLWorkspace/src/
+nvidiaDriverPath : {{cnf["nvidia-driver-path"]}}
+clusterId : {{cnf["clusterId"]}}
+domain : {{cnf["network"]["domain"]}}
+apiserver: {{cnf["api_servers"]}}
+certificate-authority: /etc/kubernetes/ssl/ca.pem
+client-certificate: /etc/kubernetes/ssl/apiserver.pem
+client-key: /etc/kubernetes/ssl/apiserver-key.pem
+pod_ip_range: {{cnf["pod_ip_range"]}}
+per_user_gpu_limit: {{cnf["per_user_gpu_limit"]}}
+rest-api: {{cnf["rest-api"]}}
+usefreeflow: {{cnf["usefreeflow"]}}
+mountdescription : {{cnf["mountdescription"]}}
+mountpoints : {{cnf["mountpoints"]}} 
+mounthomefolder : {{cnf["mounthomefolder"]}}
+deploymounts : {{cnf["deploymounts"]}}
+default-storage-folders : {{cnf["default-storage-folders"]}}
+webportal_node: {{cnf["webportal_node"]}}
+datasource : {{cnf["datasource"]}}
+kube_custom_scheduler: {{cnf["kube_custom_scheduler"]}}
